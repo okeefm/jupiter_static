@@ -77,118 +77,122 @@
       google.maps.event.addDomListener(window, 'load', initialize);
 	  
 	  function loadAdditionalData() {
-		  $.getJSON("recreation_data/state_parks.json", function(data) {
-			$.each(data.data, function(index, elem) {
-				if (getDistanceFromLatLonInKm(centerLat, centerLon, elem[21], elem[20]) < radius) {
-					var latLng = new google.maps.LatLng(elem[21], elem[20]); 
-					// Creating a marker and putting it on the map
-					var marker = new google.maps.Marker({
-						position: latLng,
-						animation: google.maps.Animation.DROP,
-						title: elem[8] + " " + elem[9],
-						icon: "maps_markers/darkgreen_markerP.png"
-					});
-					
-					google.maps.event.addListener(marker, 'click', function() {
-						infowindow.close();
-						var contentString = "<div>"+elem[8] + " " + elem[9] + "</div> <div>Link:<a target='_blank' href='" + elem[17][0] + "'>" + elem[17][0] + "</a>";
-						infowindow = new google.maps.InfoWindow({
-							content: contentString
+		  if (param("type").indexOf("parks") != -1) {
+			  $.getJSON("recreation_data/state_parks.json", function(data) {
+				$.each(data.data, function(index, elem) {
+					if (getDistanceFromLatLonInKm(centerLat, centerLon, elem[21], elem[20]) < radius) {
+						var latLng = new google.maps.LatLng(elem[21], elem[20]); 
+						// Creating a marker and putting it on the map
+						var marker = new google.maps.Marker({
+							position: latLng,
+							animation: google.maps.Animation.DROP,
+							title: elem[8] + " " + elem[9],
+							icon: "maps_markers/darkgreen_markerP.png"
 						});
-						infowindow.open(map, marker);
-					});
-					
-					marker.setMap(map);
-				}
-			});
-		  });
-		  
-		  $.getJSON("recreation_data/todos_outdoors.json", function(data) {
-			$.each(data.data, function(index, elem) {
-				if (getDistanceFromLatLonInKm(centerLat, centerLon, elem[18][1], elem[18][2]) < radius) {
-					var latLng = new google.maps.LatLng(elem[18][1], elem[18][2]); 
-					// Creating a marker and putting it on the map
-					var marker = new google.maps.Marker({
-						position: latLng,
-						animation: google.maps.Animation.DROP,
-						title: elem[10],
-						icon: "maps_markers/darkgreen_markerS.png"
-					});
-					
-					google.maps.event.addListener(marker, 'click', function() {
-						infowindow.close();
-						if (elem[16][0] == null) {
-							var link_str = "";
-						} else {
-							var link_str = "<div>Link: <a href='"+ elem[16][0]+ "' target='_blank'>" + elem[16][0] + "</a></div>";
-						}
-						if (elem[16][1] == null) {
-							var imgString = "";
-						} else {
-							var imgString = "<div><img src='"+ elem[16][1] +"' /></div>";
-						}
-						var contentString = "<h3>" + elem[10] + "</h3><div>" + elem[11] + "</div>" + imgString + link_str;
-						infowindow = new google.maps.InfoWindow({
-							content: contentString
+						
+						google.maps.event.addListener(marker, 'click', function() {
+							infowindow.close();
+							var contentString = "<div>"+elem[8] + " " + elem[9] + "</div> <div>Link:<a target='_blank' href='" + elem[17][0] + "'>" + elem[17][0] + "</a>";
+							infowindow = new google.maps.InfoWindow({
+								content: contentString
+							});
+							infowindow.open(map, marker);
 						});
-						infowindow.open(map, marker);
-					});
-					marker.setMap(map);
-				}
-			});
-		});
-			
-		$.getJSON("recreation_data/hikingtrails_100_dedup.json", function(data) {
-			$.each(data.features, function(index, elem) {
-			if (getDistanceFromLatLonInKm(centerLat, centerLon, elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]) < radius) {
-				var latLng = new google.maps.LatLng(elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]); 
-				// Creating a marker and putting it on the map
-				var marker = new google.maps.Marker({
-					position: latLng,
-					animation: google.maps.Animation.DROP,
-					title: toTitleCase(elem.properties.Name),
-					icon: "maps_markers/brown_markerH.png"
+						
+						marker.setMap(map);
+					}
 				});
-				
-				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.close();
-					var contentString = "<div>" + toTitleCase(elem.properties.Name) + "</div>";
-					infowindow = new google.maps.InfoWindow({
-						content: contentString
-					});
-					infowindow.open(map, marker);
+			  });
+			  
+			  $.getJSON("recreation_data/todos_outdoors.json", function(data) {
+				$.each(data.data, function(index, elem) {
+					if (getDistanceFromLatLonInKm(centerLat, centerLon, elem[18][1], elem[18][2]) < radius) {
+						var latLng = new google.maps.LatLng(elem[18][1], elem[18][2]); 
+						// Creating a marker and putting it on the map
+						var marker = new google.maps.Marker({
+							position: latLng,
+							animation: google.maps.Animation.DROP,
+							title: elem[10],
+							icon: "maps_markers/darkgreen_markerS.png"
+						});
+						
+						google.maps.event.addListener(marker, 'click', function() {
+							infowindow.close();
+							if (elem[16][0] == null) {
+								var link_str = "";
+							} else {
+								var link_str = "<div>Link: <a href='"+ elem[16][0]+ "' target='_blank'>" + elem[16][0] + "</a></div>";
+							}
+							if (elem[16][1] == null) {
+								var imgString = "";
+							} else {
+								var imgString = "<div><img src='"+ elem[16][1] +"' /></div>";
+							}
+							var contentString = "<h3>" + elem[10] + "</h3><div>" + elem[11] + "</div>" + imgString + link_str;
+							infowindow = new google.maps.InfoWindow({
+								content: contentString
+							});
+							infowindow.open(map, marker);
+						});
+						marker.setMap(map);
+					}
 				});
-				
-				marker.setMap(map);
-			}
 			});
-		});
+		}
 		
-		$.getJSON("recreation_data/biketrails_100_dedup.json", function(data) {
-			$.each(data.features, function(index, elem) {
-			if (getDistanceFromLatLonInKm(centerLat, centerLon, elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]) < radius) {
-				var latLng = new google.maps.LatLng(elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]); 
-				// Creating a marker and putting it on the map
-				var marker = new google.maps.Marker({
-					position: latLng,
-					animation: google.maps.Animation.DROP,
-					title: toTitleCase(elem.properties.Name),
-					icon: "maps_markers/brown_markerB.png"
-				});
-				
-				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.close();
-					var contentString = "<div>" + toTitleCase(elem.properties.Name) + "</div>";
-					infowindow = new google.maps.InfoWindow({
-						content: contentString
+		if (param("type").indexOf("trails") != -1) {
+			$.getJSON("recreation_data/hikingtrails_100_dedup.json", function(data) {
+				$.each(data.features, function(index, elem) {
+				if (getDistanceFromLatLonInKm(centerLat, centerLon, elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]) < radius) {
+					var latLng = new google.maps.LatLng(elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]); 
+					// Creating a marker and putting it on the map
+					var marker = new google.maps.Marker({
+						position: latLng,
+						animation: google.maps.Animation.DROP,
+						title: toTitleCase(elem.properties.Name),
+						icon: "maps_markers/brown_markerH.png"
 					});
-					infowindow.open(map, marker);
+					
+					google.maps.event.addListener(marker, 'click', function() {
+						infowindow.close();
+						var contentString = "<div>" + toTitleCase(elem.properties.Name) + "</div>";
+						infowindow = new google.maps.InfoWindow({
+							content: contentString
+						});
+						infowindow.open(map, marker);
+					});
+					
+					marker.setMap(map);
+				}
 				});
-				
-				marker.setMap(map);
-			}
 			});
-		});
+			
+			$.getJSON("recreation_data/biketrails_100_dedup.json", function(data) {
+				$.each(data.features, function(index, elem) {
+				if (getDistanceFromLatLonInKm(centerLat, centerLon, elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]) < radius) {
+					var latLng = new google.maps.LatLng(elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]); 
+					// Creating a marker and putting it on the map
+					var marker = new google.maps.Marker({
+						position: latLng,
+						animation: google.maps.Animation.DROP,
+						title: toTitleCase(elem.properties.Name),
+						icon: "maps_markers/brown_markerB.png"
+					});
+					
+					google.maps.event.addListener(marker, 'click', function() {
+						infowindow.close();
+						var contentString = "<div>" + toTitleCase(elem.properties.Name) + "</div>";
+						infowindow = new google.maps.InfoWindow({
+							content: contentString
+						});
+						infowindow.open(map, marker);
+					});
+					
+					marker.setMap(map);
+				}
+				});
+			});
+		}
 	  }
 	
 	function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
