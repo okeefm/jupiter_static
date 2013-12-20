@@ -26,11 +26,19 @@ file = File.open( ARGV[0] )
 
 doc = Nokogiri::XML(file)
 
+trails = {}
+
 doc.css("Placemark").each { |elem| 
 	lats = elem.css("Point coordinates").text.split(",")
-	#puts lats
+	name = elem.css("name").text
 	if distance(centroid_loc, [lats[1].to_f, lats[0].to_f]) > 100 then
 		elem.remove
+	else
+		if !trails.has_key?(name)
+			trails[name] = elem
+		else
+			elem.remove
+		end
 	end
 }
 
