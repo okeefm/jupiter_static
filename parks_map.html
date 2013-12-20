@@ -18,12 +18,14 @@
 		var markers = [];
 		var centerLat = null;
 		var centerLon = null;
-		var base_url = "http://localhost/jupiter_static/"
+		var infowindow = new google.maps.InfoWindow();
+		
 		if (param("radius") != null) {
 			radius = parseInt(param("radius"));
 		} else {
 			var radius = 32;
 		}
+		
       function initialize() {
 		$.get("https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + param("zip"), function(data) {
 			centerLat = data.results[0].geometry.location.lat;
@@ -35,9 +37,22 @@
 			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
 			
+			var marker = new google.maps.Marker({
+				position: new google.maps.LatLng(centerLat, centerLon),
+				animation: google.maps.Animation.DROP,
+				title: "Me",
+				icon: "maps_markers/yellow_markerL.png"
+			});
+			
+			var contentString = "<div>Me</div>";
+				infowindow = new google.maps.InfoWindow({
+					content: contentString
+				});
+				infowindow.open(map, marker);
+			
 			google.maps.event.addListener(marker, 'click', function() {
 				infowindow.close();
-				var contentString = "<div>My Location</div>";
+				var contentString = "<div>Me</div>";
 				infowindow = new google.maps.InfoWindow({
 					content: contentString
 				});
@@ -87,8 +102,6 @@
 				}
 			});
 		  });
-		  
-		  var infowindow = new google.maps.InfoWindow();
 		  
 		  $.getJSON("recreation_data/todos_outdoors.json", function(data) {
 			$.each(data.data, function(index, elem) {
