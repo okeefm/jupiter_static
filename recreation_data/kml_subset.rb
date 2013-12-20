@@ -20,17 +20,20 @@ class Numeric
      d = 6371 * c; # Multiply by 6371 to get Kilometers
   end
 
-centroid_loc = [42.659054, -73.756027]
+centroid_loc = [42.237228, -73.772507]
 
 file = File.open( ARGV[0] )
 
 doc = Nokogiri::XML(file)
 
-doc.css("Placemark").each |elem| do
-	lats = elem.css("Point coordinates").split(",").to_i
-	if distance(centroid_loc, [lats[0], lats[1]]) > 150 then
+doc.css("Placemark").each { |elem| 
+	lats = elem.css("Point coordinates").text.split(",")
+	#puts lats
+	if distance(centroid_loc, [lats[1].to_f, lats[0].to_f]) > 100 then
 		elem.remove
 	end
-end
+}
+
+puts doc.to_xml
 
 file.close
