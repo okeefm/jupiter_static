@@ -34,17 +34,28 @@
 			};
 			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
+			
+			google.maps.event.addListener(marker, 'click', function() {
+				infowindow.close();
+				var contentString = "<div>My Location</div>";
+				infowindow = new google.maps.InfoWindow({
+					content: contentString
+				});
+				infowindow.open(map, marker);
+			});
+				
+			marker.setMap(map);
 				
 			/*var ctaLayer = new google.maps.KmlLayer({
-				url: 'http://okeefm.dyndns-home.com/okeefm/hikingtrails.kml'
+				url: 'http://okeefm.myrpi.org/hikingtrails_100_dedup.kmz'
 			  });
 			ctaLayer.setMap(map);*/
 			
 			loadAdditionalData();
 			
-			var myParser = new geoXML3.parser({map: map, zoom: false, singleInfoWindow: true});
-			myParser.parse('recreation_data/hikingtrails.kml');
-			//myParser.parse('recreation_data/biketrails.kml');
+			//var myParser = new geoXML3.parser({map: map, zoom: false, singleInfoWindow: true});
+			//myParser.parse('recreation_data/hikingtrails_100.kml');
+			//myParser.parse('recreation_data/biketrails_100.kml');
 		});
 
       }
@@ -60,8 +71,18 @@
 						position: latLng,
 						animation: google.maps.Animation.DROP,
 						title: elem[8] + " " + elem[9],
-						icon: "maps_markers/darkgreen_markerS.png"
+						icon: "maps_markers/darkgreen_markerP.png"
 					});
+					
+					google.maps.event.addListener(marker, 'click', function() {
+						infowindow.close();
+						var contentString = "<div>"+elem[8] + " " + elem[9] + "</div> <div>Link:<a target='_blank' href='" + elem[17][0] + "'>" + elem[17][0] + "</a>";
+						infowindow = new google.maps.InfoWindow({
+							content: contentString
+						});
+						infowindow.open(map, marker);
+					});
+					
 					marker.setMap(map);
 				}
 			});
@@ -78,7 +99,7 @@
 						position: latLng,
 						animation: google.maps.Animation.DROP,
 						title: elem[10],
-						icon: "maps_markers/darkgreen_markerT.png"
+						icon: "maps_markers/darkgreen_markerS.png"
 					});
 					
 					google.maps.event.addListener(marker, 'click', function() {
@@ -102,7 +123,59 @@
 					marker.setMap(map);
 				}
 			});
-		  });
+		});
+			
+		$.getJSON("recreation_data/hikingtrails_100_dedup.json", function(data) {
+			$.each(data.features, function(index, elem) {
+			if (getDistanceFromLatLonInKm(centerLat, centerLon, elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]) < radius) {
+				var latLng = new google.maps.LatLng(elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]); 
+				// Creating a marker and putting it on the map
+				var marker = new google.maps.Marker({
+					position: latLng,
+					animation: google.maps.Animation.DROP,
+					title: toTitleCase(elem.properties.Name),
+					icon: "maps_markers/brown_markerH.png"
+				});
+				
+				google.maps.event.addListener(marker, 'click', function() {
+					infowindow.close();
+					var contentString = "<div>" + toTitleCase(elem.properties.Name) + "</div>";
+					infowindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+					infowindow.open(map, marker);
+				});
+				
+				marker.setMap(map);
+			}
+			});
+		});
+		
+		$.getJSON("recreation_data/biketrails_100_dedup.json", function(data) {
+			$.each(data.features, function(index, elem) {
+			if (getDistanceFromLatLonInKm(centerLat, centerLon, elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]) < radius) {
+				var latLng = new google.maps.LatLng(elem.geometry.geometries[0].coordinates[1], elem.geometry.geometries[0].coordinates[0]); 
+				// Creating a marker and putting it on the map
+				var marker = new google.maps.Marker({
+					position: latLng,
+					animation: google.maps.Animation.DROP,
+					title: toTitleCase(elem.properties.Name),
+					icon: "maps_markers/brown_markerB.png"
+				});
+				
+				google.maps.event.addListener(marker, 'click', function() {
+					infowindow.close();
+					var contentString = "<div>" + toTitleCase(elem.properties.Name) + "</div>";
+					infowindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+					infowindow.open(map, marker);
+				});
+				
+				marker.setMap(map);
+			}
+			});
+		});
 	  }
 	
 	function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
@@ -133,6 +206,10 @@
 			params[tmparr[0]] = tmparr[1];
 		}
 		return params[name];
+	}
+	
+	function toTitleCase(str){
+		return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 	}
     </script>
   </head>
